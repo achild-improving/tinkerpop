@@ -57,6 +57,7 @@ public enum DataType {
     DURATION(0X81),
 
     CUSTOM(0),
+    PDT(0xF0),
     MARKER(0XFD),
     UNSPECIFIED_NULL(0XFE);
 

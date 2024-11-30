@@ -19,6 +19,7 @@
 package org.apache.tinkerpop.gremlin.util.ser.binary;
 
 import io.netty.buffer.ByteBufAllocator;
+import org.apache.kerby.util.HexUtil;
 import org.apache.tinkerpop.gremlin.util.ser.AbstractRoundTripTest;
 import org.apache.tinkerpop.gremlin.util.ser.NettyBufferFactory;
 import org.apache.tinkerpop.gremlin.structure.io.Buffer;
@@ -51,6 +52,11 @@ public class GraphBinaryReaderWriterRoundTripTest extends AbstractRoundTripTest 
         for (int i = 0; i < 5; i++) {
             final Buffer buffer = bufferFactory.create(allocator.buffer());
             writer.write(value, buffer);
+            buffer.readerIndex(0);
+            byte[] b = new byte[buffer.readableBytes()];
+            buffer.readBytes(b);
+            String hex = HexUtil.bytesToHexFriendly(b);
+            System.out.println("hex:" + hex);
             buffer.readerIndex(0);
             final Object result = reader.read(buffer);
 

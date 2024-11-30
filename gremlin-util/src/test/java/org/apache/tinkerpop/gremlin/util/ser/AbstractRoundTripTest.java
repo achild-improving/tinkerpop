@@ -28,6 +28,8 @@ import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.io.IoTest;
+import org.apache.tinkerpop.gremlin.structure.io.binary.types.ProviderDefined;
+import org.apache.tinkerpop.gremlin.structure.io.binary.types.ProviderDefinedType;
 import org.apache.tinkerpop.gremlin.structure.util.reference.ReferenceEdge;
 import org.apache.tinkerpop.gremlin.structure.util.reference.ReferenceProperty;
 import org.apache.tinkerpop.gremlin.structure.util.reference.ReferenceVertex;
@@ -72,8 +74,8 @@ public abstract class AbstractRoundTripTest {
         nestedMap.put("first", map);
 
         final Map<String, Integer> orderedMap = new LinkedHashMap<>();
-        map.put("one", 1);
-        map.put("two", 2);
+        orderedMap.put("one", 1);
+        orderedMap.put("two", 2);
 
         final List<Object> list = new ArrayList<>();
         list.add("string 1");
@@ -189,7 +191,16 @@ public abstract class AbstractRoundTripTest {
                 new Object[] {"MapNested", nestedMap, null},
                 new Object[] {"OrderedMap", orderedMap, null},
                 new Object[] {"Set", set, null},
-                new Object[] {"SetNested", nestedSet, null});
+                new Object[] {"SetNested", nestedSet, null},
+
+                // PDT
+                new Object[]{"ProviderDefined", new Point(1, 2), (Consumer<ProviderDefinedType>) pdt -> {
+                    assertEquals("Point", pdt.getName());
+                    assertEquals(2, pdt.getProperties().size());
+                    assertEquals(1, pdt.getProperties().get("x"));
+                    assertEquals(2, pdt.getProperties().get("y"));
+                }}
+        );
     }
 
     @Parameterized.Parameter(value = 0)
@@ -200,4 +211,23 @@ public abstract class AbstractRoundTripTest {
 
     @Parameterized.Parameter(value = 2)
     public Consumer<?> assertion;
+
+    @ProviderDefined
+    public static class Point {
+        private final Integer x;
+        private final Integer y;
+
+        public Point(Integer x, Integer y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public Integer getX() {
+            return this.x;
+        }
+
+        public Integer getY() {
+            return this.y;
+        }
+    }
 }

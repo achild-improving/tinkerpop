@@ -27,6 +27,11 @@ import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Property;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
+import org.apache.tinkerpop.gremlin.structure.io.binary.types.Address;
+import org.apache.tinkerpop.gremlin.structure.io.binary.types.Person;
+import org.apache.tinkerpop.gremlin.structure.io.binary.types.Point;
+import org.apache.tinkerpop.gremlin.structure.io.binary.types.ProviderDefinedType;
+import org.apache.tinkerpop.gremlin.structure.io.binary.types.ProviderDefinedTypeFactory;
 import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils;
 import org.apache.tinkerpop.gremlin.util.ser.AbstractMessageSerializer;
 import org.apache.tinkerpop.gremlin.util.ser.GraphBinaryMessageSerializerV4;
@@ -41,6 +46,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 @RunWith(Parameterized.class)
 public class GremlinServerSerializationIntegrateTest extends AbstractGremlinServerIntegrationTest {
@@ -83,6 +89,55 @@ public class GremlinServerSerializationIntegrateTest extends AbstractGremlinServ
         final Vertex vertex = client.submit("gmodern.V(1)").one().getVertex();
 
         assertVertexWithProperties(vertex);
+    }
+
+    @Test
+    public void shouldHandlePdtScript() {
+        final Vertex vertex = client.submit("import org.apache.tinkerpop.gremlin.structure.io.binary.types.Point; p = new Point(1,2); gmodern.V(1).property('point',p)").one().getVertex();
+        ProviderDefinedType pdt = (ProviderDefinedType) vertex.property("point").value();
+        assertEquals(1, pdt.getProperties().get("x"));
+        assertEquals(2, pdt.getProperties().get("y"));
+
+        try {
+            Point result = ProviderDefinedTypeFactory.toObject(pdt, Point.class);
+            System.out.println(result);
+            assertEquals(1, result.getX().intValue());
+            assertEquals(2, result.getY().intValue());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void shouldHandlePdtBytecode() {
+        final Vertex vertex = g.V(1)
+                .property("point", new Point(1, 2))
+                .property("info", new Person("andrea", 123, new Address(321, "Main St", "sshhh"), "ABC432"))
+                .next();
+
+        ProviderDefinedType pdt1 = (ProviderDefinedType) vertex.property("point").value();
+        try {
+            Point result = ProviderDefinedTypeFactory.toObject(pdt1, Point.class);
+            System.out.println(result);
+            assertEquals(1, result.getX().intValue());
+            assertEquals(2, result.getY().intValue());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        ProviderDefinedType pdt2 = (ProviderDefinedType) vertex.property("info").value();
+        try {
+            Person result = ProviderDefinedTypeFactory.toObject(pdt2, Person.class);
+            System.out.println(result);
+            assertEquals("andrea", result.getName());
+            assertEquals(123, result.getAge());
+            assertNull(result.getPassport());
+            assertEquals(321, result.getAddress().getNumber());
+            assertEquals("Main St", result.getAddress().getStreet());
+            assertNull(result.getAddress().getSecret());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test

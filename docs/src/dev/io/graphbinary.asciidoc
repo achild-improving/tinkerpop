@@ -483,7 +483,7 @@ Example values:
 [source,text]
 ----
 03 00 00 00 00 05 50 6F 69 6E 74: the string "Point"
-0A 00 00 00 00 02 31 30: length 2 map header
+0A 00 00 00 00 02: length 2 map header
 03 00 00 00 00 01 78 01 00 00 00 00 01: {x:1}
 03 00 00 00 00 01 79 01 00 00 00 00 02: {y:2}
 ----

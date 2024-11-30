@@ -102,6 +102,12 @@ limitations under the License.
             <artifactId>hamcrest</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.kerby</groupId>
+            <artifactId>kerb-simplekdc</artifactId>
+            <version>${kerby.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <directory>${basedir}/target</directory>

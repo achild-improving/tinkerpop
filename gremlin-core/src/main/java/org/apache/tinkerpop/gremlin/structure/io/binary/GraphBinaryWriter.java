@@ -19,6 +19,8 @@
 package org.apache.tinkerpop.gremlin.structure.io.binary;
 
 import org.apache.tinkerpop.gremlin.structure.io.binary.types.CustomTypeSerializer;
+import org.apache.tinkerpop.gremlin.structure.io.binary.types.ProviderDefinedType;
+import org.apache.tinkerpop.gremlin.structure.io.binary.types.ProviderDefinedTypeSerializer;
 import org.apache.tinkerpop.gremlin.structure.io.binary.types.TransformSerializer;
 import org.apache.tinkerpop.gremlin.structure.io.Buffer;
 
@@ -99,6 +101,12 @@ public class GraphBinaryWriter {
             buffer.writeBytes(customTypeCodeBytes);
             writeValue(customTypeSerializer.getTypeName(), buffer, false);
             customTypeSerializer.write(value, buffer, this);
+            return;
+        }
+
+        if (serializer instanceof ProviderDefinedTypeSerializer) {
+            buffer.writeBytes(new byte[] { DataType.PDT.getCodeByte() });
+            writeValue(value instanceof ProviderDefinedType ? value : new ProviderDefinedType(value), buffer, true);
             return;
         }
 
