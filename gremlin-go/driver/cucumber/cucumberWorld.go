@@ -68,7 +68,9 @@ func getEnvOrDefaultInt(key string, defaultValue int) int {
 }
 
 func scenarioUrl() string {
-	return getEnvOrDefaultString("GREMLIN_SERVER_URL", "ws://localhost:45940/gremlin")
+	// using port 45940 which does not require auth
+	// TODO change to port 45941 which requires basic auth
+	return getEnvOrDefaultString("GREMLIN_SERVER_URL", "http://localhost:45940/gremlin")
 }
 
 func NewCucumberWorld() *CucumberWorld {

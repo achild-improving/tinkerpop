@@ -284,7 +284,7 @@ public class HttpGremlinEndpointHandler extends SimpleChannelInboundHandler<Requ
             return error;
         }
 
-        logger.warn(String.format("Exception processing request [%s].", requestMessage));
+        logger.warn(String.format("Exception processing request [%s].", requestMessage), t);
         return GremlinError.general(t);
     }
 

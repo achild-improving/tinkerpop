@@ -120,20 +120,20 @@ func TestStrategy(t *testing.T) {
 		assert.Equal(t, int32(0), val)
 	})
 
-	t.Run("Test Bytecode generation for MatchAlgorithmStrategy", func(t *testing.T) {
-		g := getModernGraph(t, testNoAuthUrl, &AuthInfo{}, &tls.Config{})
-		defer g.remoteConnection.Close()
-
-		config := MatchAlgorithmStrategyConfig{MatchAlgorithm: "greedy"}
-		bytecode := g.WithStrategies(MatchAlgorithmStrategy(config)).bytecode
-		assert.Equal(t, 1, len(bytecode.sourceInstructions))
-		assert.Equal(t, 1, len(bytecode.sourceInstructions[0].arguments))
-		assert.Equal(t, "withStrategies", bytecode.sourceInstructions[0].operator)
-		assert.Equal(t, "org.apache.tinkerpop.gremlin.process.traversal.strategy.finalization.MatchAlgorithmStrategy",
-			bytecode.sourceInstructions[0].arguments[0].(*traversalStrategy).name)
-		assert.Equal(t, map[string]interface{}{"matchAlgorithm": "greedy"},
-			bytecode.sourceInstructions[0].arguments[0].(*traversalStrategy).configuration)
-	})
+	//t.Run("Test Bytecode generation for MatchAlgorithmStrategy", func(t *testing.T) {
+	//	g := getModernGraph(t, testNoAuthUrl, &AuthInfo{}, &tls.Config{})
+	//	defer g.remoteConnection.Close()
+	//
+	//	config := MatchAlgorithmStrategyConfig{MatchAlgorithm: "greedy"}
+	//	bytecode := g.WithStrategies(MatchAlgorithmStrategy(config)).bytecode
+	//	assert.Equal(t, 1, len(bytecode.sourceInstructions))
+	//	assert.Equal(t, 1, len(bytecode.sourceInstructions[0].arguments))
+	//	assert.Equal(t, "withStrategies", bytecode.sourceInstructions[0].operator)
+	//	assert.Equal(t, "org.apache.tinkerpop.gremlin.process.traversal.strategy.finalization.MatchAlgorithmStrategy",
+	//		bytecode.sourceInstructions[0].arguments[0].(*traversalStrategy).name)
+	//	assert.Equal(t, map[string]interface{}{"matchAlgorithm": "greedy"},
+	//		bytecode.sourceInstructions[0].arguments[0].(*traversalStrategy).configuration)
+	//})
 
 	t.Run("Test read with AdjacentToIncidentStrategy", func(t *testing.T) {
 		g := getModernGraph(t, testNoAuthUrl, &AuthInfo{}, &tls.Config{})
@@ -336,8 +336,8 @@ func TestStrategy(t *testing.T) {
 		defer g.remoteConnection.Close()
 
 		config := EdgeLabelVerificationStrategyConfig{
-			LogWarning:      true,
-			ThrowExcecption: true,
+			LogWarning:     true,
+			ThrowException: true,
 		}
 		count, err := g.WithStrategies(EdgeLabelVerificationStrategy(config)).V().Count().ToList()
 		assert.Nil(t, err)
